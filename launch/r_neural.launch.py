@@ -93,7 +93,7 @@ def generate_launch_description():
     for i in range(num_robots):
         controller_entities.append(Node(
             package='lp_neural_swarm',
-            executable='neural_slice.py',
+            executable='neural_controller.py',
             name= f'neural_controller{i+1}',
             namespace= f'Robot{i+1}',
             output='screen',

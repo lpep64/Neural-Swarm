@@ -34,8 +34,7 @@ class RobotController(Node):
         self.declare_parameter('total_robots', 5)
         self.total_robots = self.get_parameter('total_robots').get_parameter_value().integer_value
         
-        self.declare_parameter('source_robot_id', 1)
-        self.source_robot_id = self.get_parameter('source_robot_id').get_parameter_value().integer_value
+        self.source_robot_id = self.robot_id
         
         self.declare_parameter('swarm_distance_threshold', 1.0)
         self.swarm_distance_threshold = self.get_parameter('swarm_distance_threshold').get_parameter_value().double_value
