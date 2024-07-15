@@ -20,26 +20,27 @@ It publishes velocity commands (`Twist` messages) to `/Robot<robot_id>/cmd_vel`.
 The core functionality involves:
 
 1. **Initialization**:
+
    - Initializes ROS parameters, publishers, subscribers, and neural network model.
    - Loads pre-trained neural network weights and historical training data if available.
-
 2. **Data Handling**:
+
    - Receives and processes laser scan and odometry data.
    - Prepares input data for the neural network.
-
 3. **Neural Network Action**:
+
    - Uses a neural network model (defined using TensorFlow/Keras) to predict robot velocity (`linear_x` and `angular_z`) based on input sensor data.
    - Adds random noise to the neural network output for exploration.
-
 4. **Reward Function**:
+
    - Calculates a reward based on robot behavior (velocity and orientation).
    - Penalizes proximity to obstacles based on laser scan data.
-
 5. **Training**:
+
    - Trains the neural network periodically using historical data and rewards accumulated during operation.
    - Saves updated neural network weights and training data for future use.
-
 6. **Robot Reorientation**:
+
    - Monitors the robot's orientation and reorients it if it becomes upside-down or unstable.
 
 ### Usage
