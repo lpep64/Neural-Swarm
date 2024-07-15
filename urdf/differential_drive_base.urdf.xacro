@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<robot name="differential_drive_base" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+  <xacro:property name="cam_side" value="0.03" />
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+  <xacro:property name="M_PI_2" value="1.570796327" />
+  <xacro:property name="M_PI_4" value="0.78539816339" />
+
+  <!-- Macro for calculating inertia of cylinder -->
+  <xacro:macro name="cylinder_inertia" params="m r h">
+    <inertia  ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
+              iyy="${m*(3*r*r+h*h)/12}" iyz = "0"
+              izz="${m*r*r/2}" /> 
+  </xacro:macro>
+
+<!-- Macro for calculating inertia of box -->
+  <xacro:macro name="box_inertia" params="m l w h">
+    <inertia  ixx="${m*(w*w+h*h)/12}" ixy = "0" ixz = "0"
+              iyy="${m*(l*l+h*h)/12}" iyz = "0"
+              izz="${m*(l*l+w*w)/12}" /> 
+  </xacro:macro>
+  
+  <xacro:macro name="differential_drive_base" params="robot_namespace  base_link base_length base_width base_height base_mass wheel_height wheel_radius wheel_mass"> 
+
+  <!-- BASE-LINK -->
+  <!--Actual body/chassis of the robot-->
+  <link name="${base_link}">
+    <inertial>
+      <mass value="${base_mass}" />
+      <origin xyz="0 0 0" />
+      <!--The 3x3 rotational inertia matrix. -->
+        <xacro:box_inertia  m="${base_mass}" l="${base_length}" w="${base_width}" h="${base_height}" />
+
+    </inertial>    
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+         <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+      <material name="White" />
+    </visual>  
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0 " />
+      <geometry>
+         <box size="${base_length} ${base_width} ${base_height}"/>
+      </geometry>
+    </collision>     
+  </link>
+  <gazebo reference="${base_link}">
+    <material>Gazebo/White</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+
+  <!-- caster wheel -->
+  <link name="caster_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.032"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <sphere radius="0.032"/>
+      </geometry>
+      <material name="Blue" />
+    </visual>
+  </link>
+
+  <gazebo reference="caster_link">
+      <mu1 value="0.0"/>
+      <mu2 value="0.0"/>
+    <material>Gazebo/Blue</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+
+  <joint name="caster_joint" type="fixed">
+    <origin xyz="${base_length/2} 0 ${-base_height/2}" rpy="0 0 0" />
+    <parent link="${base_link}"/>
+    <child link="caster_link" />
+  </joint>
+
+
+  <!-- RIGHT WHEEL -->
+  <link name="back_right_wheel">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 ${M_PI/2} ${M_PI/2}" /> 
+      <geometry>
+        <cylinder length="${wheel_height}" radius="${wheel_radius}" />
+      </geometry>
+      <material name="DarkGray" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 ${M_PI/2} ${M_PI/2}" />
+      <geometry>
+        <cylinder length="${wheel_height}" radius="${wheel_radius}" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${wheel_mass}" />
+      <origin xyz="0 0 0" rpy="0 ${M_PI/2} ${M_PI/2}" />
+      <xacro:cylinder_inertia  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_height}" />
+       <inertia ixx="8.7002718e-03" ixy="-4.7576583e-05" ixz="1.1160499e-04"
+                    iyy="8.6195418e-03" iyz="-3.5422299e-06"
+                    izz="1.4612727e-02" />
+    </inertial>
+  </link>
+
+  <gazebo reference="back_right_wheel">
+    <mu1 value="1.0"/>
+    <mu2 value="1.0"/>
+    <!--kp  value="10000.0" />
+    <kd  value="1.0" />
+    <fdir1 value="1 0 0"/-->
+    <material>Gazebo/Grey</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+
+  <joint name="back_right_wheel_joint" type="continuous">
+    <parent link="${base_link}"/>
+    <child link="back_right_wheel"/>
+    <origin xyz="${-base_length/2+wheel_radius} ${-base_width/2-wheel_height/2} ${-base_height/2}" rpy="0 0 0" /> 
+    <axis xyz="0 1 0" rpy="0 0 0" />
+    <limit effort="1000" velocity="1000"/>
+    <joint_properties damping="0.0" friction="0.0"/>
+  </joint>
+
+
+  <!-- LEFT WHEEL -->
+  <link name="back_left_wheel">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 ${M_PI/2} ${M_PI/2}" /> 
+      <geometry>
+        <cylinder length="${wheel_height}" radius="${wheel_radius}" />
+      </geometry>
+      <material name="DarkGray" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 ${M_PI/2} ${M_PI/2}" />
+      <geometry>
+        <cylinder length="${wheel_height}" radius="${wheel_radius}" />
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${wheel_mass}" />
+      <origin xyz="0 0 0" rpy="0 ${M_PI/2} ${M_PI/2}" />
+      <xacro:cylinder_inertia  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_height}" />
+    </inertial>
+  </link>
+
+  <gazebo reference="back_left_wheel">
+    <mu1 value="1.0"/>
+    <mu2 value="1.0"/>
+    <!--kp  value="10000.0" />
+    <kd  value="1.0" />
+    <fdir1 value="1 0 0"/-->
+    <material>Gazebo/Grey</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+
+  <joint name="back_left_wheel_joint" type="continuous">
+    <parent link="${base_link}"/>
+    <child link="back_left_wheel"/>
+    <origin xyz="${-base_length/2+wheel_radius} ${base_width/2+wheel_height/2} ${-base_height/2}" rpy="0 0 0" /> 
+    <axis xyz="0 1 0" rpy="0 0 0" />
+    <limit effort="100" velocity="100"/>
+    <joint_properties damping="0.0" friction="0.0"/>
+  </joint>
+
+
+
+<gazebo>
+
+
+  <!-- differential drive controller (for two wheels) -->
+  <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+    <robotNamespace>${robot_namespace}</robotNamespace>
+    <updateRate>30</updateRate>
+    <left_joint>back_left_wheel_joint</left_joint>
+    <right_joint>back_right_wheel_joint</right_joint>
+    <wheel_separation>0.35</wheel_separation>
+    <wheel_diameter>0.1</wheel_diameter>
+    <wheelAcceleration>1.8</wheelAcceleration>
+    <wheelTorque>200</wheelTorque>
+    <commandTopic>cmd_vel</commandTopic>
+    <odometryTopic>odom</odometryTopic>
+    <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+    <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
+    <odometrySource>world</odometrySource>
+    <publishWheelTF>false</publishWheelTF>
+  
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>true</publish_wheel_tf>
+    <publishTF>false</publishTF>
+    <publishWheelJointState>false</publishWheelJointState>
+    <legacyMode>false</legacyMode>
+    <robotBaseFrame>base_footprint</robotBaseFrame>
+    <rosDebugLevel>na</rosDebugLevel>
+
+   </plugin>
+
+ </gazebo>
+ 
+ </xacro:macro>
+</robot>
