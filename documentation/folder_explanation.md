@@ -4,7 +4,7 @@
 
 The `controllers` directory contains various robot movement controllers:
 
-* **baseline**: Default movement controllers without neural networks.
+* **prototypes**: Inital and experimental movement controllers
 * **neural_controller.py** and **neural_slice.py**: Neural network-based controllers for robots.
 * **utils**: Utility files supporting the neural network controllers.
 
@@ -18,11 +18,16 @@ The `documentation` folder contains multiple markdown files aimed at providing u
 
 The `launch` directory houses:
 
-- **r_neural_launch.py**: Initializes the Gazebo simulation with a specified number of robots and spawn radius.
+- **prototypes**: Contains rN.launch.py an earlier version of r_neural.launch.py.
+- **r_neural.launch.py**: Initializes the Gazebo simulation with a specified number of robots and spawn radius.
 
 ## lp_neural_swarm
 
 The `lp_neural_swarm` directory contains an empty initialization file required for `CMakeLists.txt` to create the package properly.
+
+## testing
+
+The `testing `directory contains output files of the lidar and odometry ROS2 nodes and earlier scripts of during the design process for state subscribing and publishing.
 
 ## urdf
 
