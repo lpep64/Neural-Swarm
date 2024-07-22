@@ -1,64 +1,75 @@
 #!/usr/bin/env python3
 
-# ROS2 Imports
 import rclpy
 from rclpy.node import Node
-
-# ROS2 Sub/Pub Imports
 from geometry_msgs.msg import Twist
+import sys
+import select
+import termios
+import tty
 
-# General Imports
-import keyboard  # Install with: pip install keyboard
+settings = termios.tcgetattr(sys.stdin)
 
-class RobotController(Node):
+class KeyboardController(Node):
     def __init__(self):
-        super().__init__('robot_controller')
+        super().__init__('keyboard_controller')
         
-        # Declaration of Robot Parameters (if needed)
-        self.declare_parameter('robot_id', 1)
-        self.robot_id = self.get_parameter('robot_id').get_parameter_value().integer_value
+        self.pub = self.create_publisher(Twist, '/Robot1/cmd_vel', 20)
+        self.twist = Twist()
         
-        self.cmd_vel_pub = self.create_publisher(Twist, f'/Robot{self.robot_id}/cmd_vel', 1)
-        self.timer = self.create_timer(0.2, self.publish_twist)
+        self.timer = self.create_timer(0.1, self.publish_twist)
+        self.get_logger().info('Keyboard Controller Node Initialized')
+
+        self.quit = False
+
+    def getKey(self):
+        tty.setraw(sys.stdin.fileno())
+        select.select([sys.stdin], [], [], 0)
+        key = sys.stdin.read(1)
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+        return key
+
+    def update_twist(self, key):
+        if key == 'w' or key == 's':
+            if key == 'w':
+                self.twist.linear.x += 0.3
+            else:
+                self.twist.linear.x -= 0.3
+        else:
+            self.twist.linear.x *= 0.9
+                
+        if key == 'a' or key == 'd':
+            if key == 'a':
+                self.twist.angular.z += 0.2
+            else:
+                self.twist.angular.z -= 0.2
+        else:
+            self.twist.angular.z *= 0.4
         
-        # ROS Variables
-        self.linear_x = 0.0
-        self.angular_z = 0.0
-        
-        # Start keyboard listener
-        keyboard.on_press(self.on_key_press)
-        keyboard.on_release(self.on_key_release)
-        
-        self.key_mapping = {
-            'w': (1.0, 0.0),    # Move forward
-            's': (-1.0, 0.0),   # Move backward
-            'a': (0.0, 1.0),    # Turn left
-            'd': (0.0, -1.0)    # Turn right
-        }
-        
-    def on_key_press(self, event):
-        key = event.name
-        
-        if key in self.key_mapping:
-            self.linear_x, self.angular_z = self.key_mapping[key]
-        
-    def on_key_release(self, event):
-        key = event.name
-        
-        if key in self.key_mapping:
-            self.linear_x, self.angular_z = 0.0, 0.0
-        
+        if key == 'z':
+            self.twist.linear.x = 0.0
+            self.twist.angular.z = 0.0
+         
+        if key == 'q':
+            self.quit = True
+
     def publish_twist(self):
-        twist = Twist()
-        twist.linear.x = self.linear_x
-        twist.angular.z = self.angular_z
-        self.cmd_vel_pub.publish(twist)
+        if self.quit:
+            self.get_logger().info('Shutting down, stopping robot')
+            self.twist.linear.x = 0.0
+            self.twist.angular.z = 0.0
+            self.pub.publish(self.twist)
+            rclpy.shutdown()
+            sys.exit(0)
+        
+        key = self.getKey()
+        self.update_twist(key)
+        self.pub.publish(self.twist)
 
 def main(args=None):
     rclpy.init(args=args)
-    controller = RobotController()
-    rclpy.spin(controller)
-    rclpy.shutdown()
+    node = KeyboardController()
+    rclpy.spin(node)
 
 if __name__ == '__main__':
     main()

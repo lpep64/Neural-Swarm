@@ -90,7 +90,7 @@ def generate_launch_description():
             name= f'neural_controller{i+1}',
             namespace= f'Robot{i+1}',
             output='screen',
-            parameters=[{'robot_id': i+1}, {'source_robot_id': source_id}]
+            parameters=[{'robot_id': i+1}]
         ))
 
     # Return the LaunchDescription with both robots and nodes
