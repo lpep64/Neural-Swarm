@@ -52,7 +52,7 @@ def generate_launch_description():
     for i in range(num_robots):
         try:
             robot_description.append(xacro.process_file(
-                xacro_file, mappings={'robot_namespace': f'Robot{i+1}', 'with_ydlidar': 'true', 'yl_visualize': 'false'}
+                xacro_file, mappings={'robot_namespace': f'Robot{i+1}', 'with_ydlidar': 'true', 'yl_visualize': 'true'}
             ).toxml())
         except Exception as e:
             print(f"Error processing xacro file: {e}")
