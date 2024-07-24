@@ -32,11 +32,11 @@ class KeyboardController(Node):
     def update_twist(self, key):
         if key == 'w' or key == 's':
             if key == 'w':
-                self.twist.linear.x += 0.3
+                self.twist.linear.x += 0.15
             else:
-                self.twist.linear.x -= 0.3
+                self.twist.linear.x -= 0.15
         else:
-            self.twist.linear.x *= 0.9
+            self.twist.linear.x *= 0.8
                 
         if key == 'a' or key == 'd':
             if key == 'a':

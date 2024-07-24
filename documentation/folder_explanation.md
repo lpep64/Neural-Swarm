@@ -6,6 +6,8 @@ The `controllers` directory contains various robot movement controllers:
 
 * **prototypes**: Inital and experimental movement controllers
 * **neural_controller.py** and **neural_slice.py**: Neural network-based controllers for robots.
+* **race_controller:** Advanced 2.0 version of Neural network controllers
+* **self_controller:** A self controller for robot 1 using 'wasdzq' as controls on keyboard
 * **utils**: Utility files supporting the neural network controllers.
 
 For detailed explanations of the neural network controllers, refer to `documentation/neural_explanation.md`.
@@ -20,6 +22,8 @@ The `launch` directory houses:
 
 - **prototypes**: Contains rN.launch.py an earlier version of r_neural.launch.py.
 - **r_neural.launch.py**: Initializes the Gazebo simulation with a specified number of robots and spawn radius.
+- **race.launch.py:** Initalizes the Gazebo simulation with 4 robots encouraged to go in along a track
+- **single.launch.py**: Initalizes a Gazebo simulation with 1 robot, in another terminal if self_controller.py is run the robot can be self controlled
 
 ## lp_neural_swarm
 
